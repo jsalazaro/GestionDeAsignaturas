@@ -31,7 +31,8 @@ public class Gestor {
      */
     public boolean existeGrupo(Grupo grupo) {
         // TODO: existeGrupo (11)
-        return false;
+        if (grupo == null) return false;
+        return registro.containsKey(grupo);
     }
 
     /**
@@ -41,6 +42,8 @@ public class Gestor {
      */
     public void anadirGrupo(Grupo grupo) {
         // TODO: anadirGrupo (12)
+        if (grupo == null) return;
+        registro.put(grupo, new HashMap<>());
     }
 
     /**
@@ -50,7 +53,11 @@ public class Gestor {
      */
     public TreeSet<Grupo> getGrupos() {
         // TODO: getGrupos (13)
-        return null;
+        TreeSet<Grupo> arbol = new TreeSet<>();
+        for (Grupo grupo : registro.keySet()) {
+            arbol.add(grupo);
+        }
+        return arbol;
     }
 
     /**
@@ -59,6 +66,7 @@ public class Gestor {
      */
     public void borrarGrupo(Grupo grupo) {
         // TODO: borrarGrupo (14)
+        //registro.get(grupo)
     }
 
     //endregion
