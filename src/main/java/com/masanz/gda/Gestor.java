@@ -32,6 +32,7 @@ public class Gestor {
     public boolean existeGrupo(Grupo grupo) {
         // TODO: existeGrupo (11)
         if (grupo == null) return false;
+
         return registro.containsKey(grupo);
     }
 
@@ -43,6 +44,7 @@ public class Gestor {
     public void anadirGrupo(Grupo grupo) {
         // TODO: anadirGrupo (12)
         if (grupo == null) return;
+
         registro.put(grupo, new HashMap<>());
     }
 
@@ -57,6 +59,7 @@ public class Gestor {
         for (Grupo grupo : registro.keySet()) {
             arbol.add(grupo);
         }
+
         return arbol;
     }
 
