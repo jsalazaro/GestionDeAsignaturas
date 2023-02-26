@@ -69,7 +69,7 @@ public class Gestor {
      */
     public void borrarGrupo(Grupo grupo) {
         // TODO: borrarGrupo (14)
-        //registro.get(grupo)
+        registro.get(grupo).remove(getAsignaturas());
     }
 
     //endregion
@@ -84,7 +84,10 @@ public class Gestor {
      */
     public boolean existeAsignaturaGrupo(Asignatura asignatura, Grupo grupo) {
         // TODO: existeAsignaturaGrupo (21)
-        return false;
+        if (existeGrupo(grupo)) {
+            return registro.get(grupo).containsKey(asignatura);
+        }
+        else return false;
     }
 
     /**
@@ -95,6 +98,8 @@ public class Gestor {
      */
     public void anadirAsignaturaGrupo(Asignatura asignatura, Grupo grupo) {
         // TODO: anadirAsignaturaGrupo (22)
+        anadirGrupo(grupo);
+        registro.get(grupo).put(asignatura,new ArrayList<>());
     }
 
     /**
@@ -104,7 +109,11 @@ public class Gestor {
      */
     public HashSet<Asignatura> getAsignaturas(Grupo grupo) {
         // TODO: getAsignaturas grupo (23)
-        return null;
+        HashSet<Asignatura> asignaturaHashMap = new HashSet<>();
+        if (existeGrupo(grupo)) {
+           asignaturaHashMap.addAll(registro.get(grupo).keySet());
+        }
+        return asignaturaHashMap;
     }
 
     /**
@@ -113,7 +122,11 @@ public class Gestor {
      */
     public HashSet<Asignatura> getAsignaturas() {
         // TODO: getAsignaturas todas (24)
-        return null;
+        HashSet<Asignatura> asignaturaHashMap = new HashSet<>();
+        for (Grupo grupo : registro.keySet()) {
+            asignaturaHashMap.addAll(registro.get(grupo).keySet());
+        }
+        return asignaturaHashMap;
     }
 
     /**
@@ -123,6 +136,10 @@ public class Gestor {
      */
     public void borrarAsignaturaGrupo(Asignatura asignatura, Grupo grupo) {
         // TODO: borrarAsignaturaGrupo (25)
+        if (existeAsignaturaGrupo(asignatura,grupo)){
+            registro.get(grupo).remove(asignatura);
+            registro.get(grupo).remove(registro.get(grupo).values());
+        }
     }
 
     //endregion
@@ -137,6 +154,11 @@ public class Gestor {
      */
     public ArrayList<Estudiante> getListaEstudiantesAsignaturaGrupo(Asignatura asignatura, Grupo grupo) {
         // TODO: getListaEstudiantesAsignaturaGrupo (31)
+        ArrayList<Estudiante> estudianteArrayList = new ArrayList<>();
+        if (existeAsignaturaGrupo(asignatura,grupo)){
+            estudianteArrayList.addAll(registro.get(grupo).get(asignatura));
+            return estudianteArrayList;
+        }
         return null;
     }
 
@@ -149,6 +171,9 @@ public class Gestor {
      */
     public boolean existeEstudianteAsignaturaGrupo(Estudiante estudiante, Asignatura asignatura, Grupo grupo) {
         // TODO: existeEstudianteAsignaturaGrupo (32)
+        if (existeAsignaturaGrupo(asignatura,grupo)) {
+            return registro.get(grupo).get(asignatura).contains(estudiante);
+        }
         return false;
     }
 
@@ -162,7 +187,14 @@ public class Gestor {
      */
     public Estudiante getEstudianteAsignaturaGrupo(Estudiante estudiante, Asignatura asignatura, Grupo grupo) {
         // TODO: getEstudianteAsignaturaGrupo (33)
-        return null;
+        if (existeEstudianteAsignaturaGrupo(estudiante,asignatura,grupo)){
+            for (int i = 0; i < registro.get(grupo).get(asignatura).size(); i++) {
+                if (registro.get(grupo).get(asignatura).get(i) == estudiante){
+                    return registro.get(grupo).get(asignatura).get(i);
+                }
+            }
+        }
+        return estudiante;
     }
 
 
@@ -178,6 +210,15 @@ public class Gestor {
      */
     public void anadirEstudianteAsignaturaGrupo(Estudiante estudiante, Asignatura asignatura, Grupo grupo) {
         // TODO: anadirEstudianteAsignaturaGrupo (34)
+        if (!existeGrupo(grupo)){
+            anadirGrupo(grupo);
+        }
+        if (!existeAsignaturaGrupo(asignatura,grupo)){
+            anadirAsignaturaGrupo(asignatura,grupo);
+        }
+        if (!existeEstudianteAsignaturaGrupo(estudiante,asignatura,grupo)){
+            registro.get(grupo).get(asignatura).add(estudiante);
+        } else getEstudianteAsignaturaGrupo(estudiante,asignatura,grupo).setNota(estudiante.getNota());
     }
 
     /**
