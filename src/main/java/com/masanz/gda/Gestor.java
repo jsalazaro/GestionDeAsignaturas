@@ -1,6 +1,7 @@
 package com.masanz.gda;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Nombre Apellidos
@@ -69,7 +70,7 @@ public class Gestor {
      */
     public void borrarGrupo(Grupo grupo) {
         // TODO: borrarGrupo (14)
-        registro.get(grupo).remove(getAsignaturas());
+        registro.remove(grupo);
     }
 
     //endregion
@@ -98,7 +99,9 @@ public class Gestor {
      */
     public void anadirAsignaturaGrupo(Asignatura asignatura, Grupo grupo) {
         // TODO: anadirAsignaturaGrupo (22)
-        anadirGrupo(grupo);
+        if (registro.get(grupo) == null) {
+            anadirGrupo(grupo);
+        }
         registro.get(grupo).put(asignatura,new ArrayList<>());
     }
 
@@ -187,14 +190,12 @@ public class Gestor {
      */
     public Estudiante getEstudianteAsignaturaGrupo(Estudiante estudiante, Asignatura asignatura, Grupo grupo) {
         // TODO: getEstudianteAsignaturaGrupo (33)
-        if (existeEstudianteAsignaturaGrupo(estudiante,asignatura,grupo)){
-            for (int i = 0; i < registro.get(grupo).get(asignatura).size(); i++) {
-                if (registro.get(grupo).get(asignatura).get(i) == estudiante){
-                    return registro.get(grupo).get(asignatura).get(i);
-                }
-            }
-        }
-        return estudiante;
+        ArrayList<Estudiante> estudianteArrayList = getListaEstudiantesAsignaturaGrupo(asignatura,grupo);
+        if (estudiante == null) return null;
+        if (estudianteArrayList == null) return null;
+        if (!estudianteArrayList.contains(estudiante)) return null;
+        int pos = estudianteArrayList.indexOf(estudiante);
+        return estudianteArrayList.get(pos);
     }
 
 
@@ -229,6 +230,9 @@ public class Gestor {
      */
     public void borrarEstudianteAsignaturaGrupo(Estudiante estudiante, Asignatura asignatura, Grupo grupo) {
         // TODO: borrarEstudianteAsignaturaGrupo (35)
+        if(existeEstudianteAsignaturaGrupo(estudiante,asignatura,grupo)){
+            registro.get(grupo).get(asignatura).remove(estudiante);
+        }
     }
 
     //endregion
@@ -243,7 +247,18 @@ public class Gestor {
      */
     public ArrayList<Estudiante> getEstudiantes(Grupo grupo) {
         // TODO: getEstudiantes grupo (41)
-        return null;
+        ArrayList<Estudiante> estudiantes = new ArrayList<>();
+        HashSet<Estudiante> estudianteHashSet = new HashSet<>();
+        for (Map.Entry<Grupo, HashMap<Asignatura, ArrayList<Estudiante>>> entry : registro.entrySet()) {
+            Grupo g = entry.getKey();
+            HashSet<Asignatura> asignaturas = getAsignaturas(grupo);
+            for (Asignatura asignatura : asignaturas) {
+                estudiantes.addAll(registro.get(grupo).get(asignatura));
+            }
+        }
+        ArrayList<Estudiante> estudiantes2 = estudiantes.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
+        if (estudiantes2.isEmpty()) return null;
+        return estudiantes2;
     }
 
     /**
@@ -256,7 +271,14 @@ public class Gestor {
      */
     public ArrayList<Estudiante> getEstudiantes(Asignatura asignatura) {
         // TODO: getEstudiantes asignatura (42)
-        return null;
+        ArrayList<Estudiante> estudiantes = new ArrayList<>();
+        for (Grupo grupo : registro.keySet()) {
+            if (registro.get(grupo).get(asignatura) != null) {
+                estudiantes.addAll(registro.get(grupo).get(asignatura));
+            }
+        }
+        if (estudiantes.isEmpty()) return null;
+        return estudiantes;
     }
 
     /**
@@ -268,7 +290,18 @@ public class Gestor {
      */
     public TreeMap<Estudiante,Grupo> getEstudiantesConNotaMayorIgualQue(Asignatura asignatura, double nota) {
         // TODO: getEstudiantesConNotaMayorIgualQue (43)
-        return null;
+        TreeMap<Estudiante, Grupo> arbol = new TreeMap<>();
+        ArrayList<Estudiante> estudiantesTotal = getEstudiantes(asignatura);
+        for (Estudiante estudiante : estudiantesTotal) {
+            if (estudiante.getNota() >= nota){
+                for (Grupo grupo : registro.keySet()) {
+                    if (existeEstudianteAsignaturaGrupo(estudiante,asignatura,grupo)){
+                        arbol.put(estudiante,grupo);
+                    }
+                }
+            }
+        }
+        return arbol;
     }
 
     //endregion
@@ -296,7 +329,16 @@ public class Gestor {
      */
     public TreeMap<Integer,Integer> getDistribucionNotasAsignaturaGrupo(Asignatura asignatura, Grupo grupo) {
         // TODO: getDistribucionNotasAsignaturaGrupo (51)
-        return null;
+        TreeMap<Integer, Integer> mapa = new TreeMap<>();
+        ArrayList<Estudiante> estudiantes = new ArrayList<>(getListaEstudiantesAsignaturaGrupo(asignatura,grupo));
+        int[] notas = new int[10];
+        for (Estudiante estudiante : estudiantes) {
+            notas[(int)estudiante.getNota()]++;
+        }
+        for (int i = 0; i < notas.length; i++) {
+            mapa.put(i, notas[i]);
+        }
+        return mapa;
     }
 
     /**
@@ -315,7 +357,22 @@ public class Gestor {
      */
     public TreeMap<Integer,Integer> getDistribucionNotasAsignatura(Asignatura asignatura) {
         // TODO: getDistribucionNotasAsignatura (52)
-        return null;
+        TreeMap<Integer, Integer> mapa = new TreeMap<>();
+        int[] notas = new int[13];
+        for (Map.Entry<Grupo, HashMap<Asignatura, ArrayList<Estudiante>>> entry : registro.entrySet()) {
+            Grupo g = entry.getKey();
+            ArrayList<Estudiante> estudiantes = getListaEstudiantesAsignaturaGrupo(asignatura,g);
+            if (estudiantes != null) {
+                for (Estudiante estudiante : estudiantes) {
+                    notas[(int) estudiante.getNota()]++;
+                }
+            }
+
+        }
+        for (int i = 0; i < notas.length; i++) {
+            mapa.put(i, notas[i]);
+        }
+        return mapa;
     }
 
     private TreeMap<Integer,Integer> acumulaDistribucionesDeNotas(TreeMap<Integer,Integer> map1, TreeMap<Integer,Integer> map2) {
@@ -341,6 +398,15 @@ public class Gestor {
      */
     public Grupo grupoDelEstudiante(String nombre, String apellidos) {
         // TODO: grupoDelEstudiante (61)
+        for (Map.Entry<Grupo, HashMap<Asignatura, ArrayList<Estudiante>>> entry : registro.entrySet()) {
+            Grupo g = entry.getKey();
+            ArrayList<Estudiante> estudiantes = getEstudiantes(g);
+            for (Estudiante estudiante : estudiantes) {
+                if (estudiante.getNombre().equals(nombre) && estudiante.getApellidos().equals(apellidos)){
+                    return g;
+                }
+            }
+        }
         return null;
     }
 
@@ -363,7 +429,19 @@ public class Gestor {
      */
     public HashMap<Asignatura, Double> notasEstudiante(String nombre, String apellidos) {
         // TODO: notasEstudiante (62)
-        return null;
+        HashMap<Asignatura, Double> notas = new HashMap<>();
+        Grupo g = grupoDelEstudiante(nombre, apellidos);
+        HashSet<Asignatura> asignaturas = getAsignaturas(g);
+        for (Asignatura asignatura : asignaturas) {
+            ArrayList<Estudiante> estudiantes = registro.get(g).get(asignatura);
+            for (Estudiante estudiante : estudiantes) {
+                if (estudiante.getNombre().equals(nombre) && estudiante.getApellidos().equals(apellidos)){
+                    notas.put(asignatura, estudiante.getNota());
+                }
+            }
+        }
+        if (notas.isEmpty()) return null;
+        return notas;
     }
 
     //endregion
