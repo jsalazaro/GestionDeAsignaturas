@@ -256,7 +256,8 @@ public class Gestor {
                 estudiantes.addAll(registro.get(grupo).get(asignatura));
             }
         }
-        ArrayList<Estudiante> estudiantes2 = estudiantes.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
+        LinkedHashSet<Estudiante> est = new LinkedHashSet<>(estudiantes);
+        ArrayList<Estudiante> estudiantes2 = new ArrayList<>(est);
         if (estudiantes2.isEmpty()) return null;
         return estudiantes2;
     }
@@ -358,7 +359,7 @@ public class Gestor {
     public TreeMap<Integer,Integer> getDistribucionNotasAsignatura(Asignatura asignatura) {
         // TODO: getDistribucionNotasAsignatura (52)
         TreeMap<Integer, Integer> mapa = new TreeMap<>();
-        int[] notas = new int[13];
+        int[] notas = new int[11];
         for (Map.Entry<Grupo, HashMap<Asignatura, ArrayList<Estudiante>>> entry : registro.entrySet()) {
             Grupo g = entry.getKey();
             ArrayList<Estudiante> estudiantes = getListaEstudiantesAsignaturaGrupo(asignatura,g);
