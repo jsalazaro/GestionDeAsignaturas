@@ -332,7 +332,7 @@ public class Gestor {
         // TODO: getDistribucionNotasAsignaturaGrupo (51)
         TreeMap<Integer, Integer> mapa = new TreeMap<>();
         ArrayList<Estudiante> estudiantes = new ArrayList<>(getListaEstudiantesAsignaturaGrupo(asignatura,grupo));
-        int[] notas = new int[10];
+        int[] notas = new int[11];
         for (Estudiante estudiante : estudiantes) {
             notas[(int)estudiante.getNota()]++;
         }
